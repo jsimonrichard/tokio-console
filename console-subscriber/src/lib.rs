@@ -21,15 +21,15 @@ use tokio::{
 };
 #[cfg(unix)]
 use tokio_stream::wrappers::UnixListenerStream;
+use tracing::{collect, Collect};
 use tracing_core::{
     span::{self, Id},
-    subscriber::{self, Subscriber},
     Metadata,
 };
 use tracing_subscriber::{
-    layer::Context,
     registry::{Extensions, LookupSpan},
-    Layer,
+    subscribe::Context,
+    Subscribe,
 };
 
 mod aggregator;
@@ -392,27 +392,27 @@ impl ConsoleLayer {
         self.async_op_callsites.contains(meta)
     }
 
-    fn is_id_spawned<S>(&self, id: &span::Id, cx: &Context<'_, S>) -> bool
+    fn is_id_spawned<C>(&self, id: &span::Id, cx: &Context<'_, C>) -> bool
     where
-        S: Subscriber + for<'a> LookupSpan<'a>,
+        C: Collect + for<'a> LookupSpan<'a>,
     {
         cx.span(id)
             .map(|span| self.is_spawn(span.metadata()))
             .unwrap_or(false)
     }
 
-    fn is_id_resource<S>(&self, id: &span::Id, cx: &Context<'_, S>) -> bool
+    fn is_id_resource<C>(&self, id: &span::Id, cx: &Context<'_, C>) -> bool
     where
-        S: Subscriber + for<'a> LookupSpan<'a>,
+        C: Collect + for<'a> LookupSpan<'a>,
     {
         cx.span(id)
             .map(|span| self.is_resource(span.metadata()))
             .unwrap_or(false)
     }
 
-    fn is_id_async_op<S>(&self, id: &span::Id, cx: &Context<'_, S>) -> bool
+    fn is_id_async_op<C>(&self, id: &span::Id, cx: &Context<'_, C>) -> bool
     where
-        S: Subscriber + for<'a> LookupSpan<'a>,
+        C: Collect + for<'a> LookupSpan<'a>,
     {
         cx.span(id)
             .map(|span| self.is_async_op(span.metadata()))
@@ -479,14 +479,14 @@ impl ConsoleLayer {
         }
     }
 
-    fn state_update<S>(
+    fn state_update<C>(
         &self,
         id: &Id,
         event: &tracing::Event<'_>,
-        ctx: &Context<'_, S>,
+        ctx: &Context<'_, C>,
         get_stats: impl for<'a> Fn(&'a Extensions) -> Option<&'a stats::ResourceStats>,
     ) where
-        S: Subscriber + for<'a> LookupSpan<'a>,
+        C: Collect + for<'a> LookupSpan<'a>,
     {
         let meta_id = event.metadata().into();
         let mut state_update_visitor = StateUpdateVisitor::new(meta_id);
@@ -524,11 +524,11 @@ impl ConsoleLayer {
     }
 }
 
-impl<S> Layer<S> for ConsoleLayer
+impl<C> Subscribe<C> for ConsoleLayer
 where
-    S: Subscriber + for<'a> LookupSpan<'a>,
+    C: Collect + for<'a> LookupSpan<'a>,
 {
-    fn register_callsite(&self, meta: &'static Metadata<'static>) -> subscriber::Interest {
+    fn register_callsite(&self, meta: &'static Metadata<'static>) -> collect::Interest {
         let dropped = match (meta.name(), meta.target()) {
             ("runtime.spawn", _) | ("task", "tokio::task") => {
                 self.spawn_callsites.insert(meta);
@@ -566,10 +566,10 @@ where
         };
 
         self.send_metadata(dropped, Event::Metadata(meta));
-        subscriber::Interest::always()
+        collect::Interest::always()
     }
 
-    fn on_new_span(&self, attrs: &span::Attributes<'_>, id: &span::Id, ctx: Context<'_, S>) {
+    fn on_new_span(&self, attrs: &span::Attributes<'_>, id: &span::Id, ctx: Context<'_, C>) {
         let metadata = attrs.metadata();
         if self.is_spawn(metadata) {
             let at = Instant::now();
@@ -679,7 +679,7 @@ where
         }
     }
 
-    fn on_event(&self, event: &tracing::Event<'_>, ctx: Context<'_, S>) {
+    fn on_event(&self, event: &tracing::Event<'_>, ctx: Context<'_, C>) {
         let metadata = event.metadata();
         if self.waker_callsites.contains(metadata) {
             let at = Instant::now();
@@ -787,7 +787,7 @@ where
         }
     }
 
-    fn on_enter(&self, id: &span::Id, cx: Context<'_, S>) {
+    fn on_enter(&self, id: &span::Id, cx: Context<'_, C>) {
         if let Some(span) = cx.span(id) {
             let now = Instant::now();
             let exts = span.extensions();
@@ -817,7 +817,7 @@ where
         }
     }
 
-    fn on_exit(&self, id: &span::Id, cx: Context<'_, S>) {
+    fn on_exit(&self, id: &span::Id, cx: Context<'_, C>) {
         if let Some(span) = cx.span(id) {
             let exts = span.extensions();
             let now = Instant::now();
@@ -844,7 +844,7 @@ where
         }
     }
 
-    fn on_close(&self, id: span::Id, cx: Context<'_, S>) {
+    fn on_close(&self, id: span::Id, cx: Context<'_, C>) {
         if let Some(span) = cx.span(&id) {
             let now = Instant::now();
             let exts = span.extensions();

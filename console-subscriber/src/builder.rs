@@ -8,12 +8,12 @@ use std::{
     time::Duration,
 };
 use tokio::runtime;
-use tracing::Subscriber;
+use tracing::Collect;
 use tracing_subscriber::{
     filter::{self, FilterFn},
-    layer::{Layer, SubscriberExt},
     prelude::*,
     registry::LookupSpan,
+    Subscribe,
 };
 
 /// Builder for configuring [`ConsoleLayer`]s.
@@ -432,7 +432,7 @@ impl Builder {
 
         tracing_subscriber::registry()
             .with(console_layer)
-            .with(tracing_subscriber::fmt::layer().with_filter(fmt_filter))
+            .with(tracing_subscriber::fmt::subscriber().with_filter(fmt_filter))
             .init();
     }
 
@@ -492,9 +492,9 @@ impl Builder {
     /// [`fmt::Layer`]: https://docs.rs/tracing-subscriber/latest/tracing-subscriber/fmt/struct.Layer.html
     /// [`console_subscriber::init`]: crate::init()
     #[must_use = "a `Layer` must be added to a `tracing::Subscriber` in order to be used"]
-    pub fn spawn<S>(self) -> impl Layer<S>
+    pub fn spawn<C>(self) -> impl Subscribe<C>
     where
-        S: Subscriber + for<'a> LookupSpan<'a>,
+        C: Collect + for<'a> LookupSpan<'a>,
     {
         fn console_filter(meta: &tracing::Metadata<'_>) -> bool {
             // events will have *targets* beginning with "runtime"
@@ -522,8 +522,8 @@ impl Builder {
             .spawn(move || {
                 let _subscriber_guard;
                 if !self_trace {
-                    _subscriber_guard = tracing::subscriber::set_default(
-                        tracing_core::subscriber::NoSubscriber::default(),
+                    _subscriber_guard = tracing::collect::set_default(
+                        tracing_core::collect::NoCollector::default(),
                     );
                 }
                 let runtime = runtime::Builder::new_current_thread()
@@ -748,11 +748,11 @@ pub fn init() {
 /// [`fmt::Layer`]: https://docs.rs/tracing-subscriber/latest/tracing-subscriber/fmt/struct.Layer.html
 /// [`console_subscriber::init`]: crate::init()
 #[must_use = "a `Layer` must be added to a `tracing::Subscriber`in order to be used"]
-pub fn spawn<S>() -> impl Layer<S>
+pub fn spawn<C>() -> impl Subscribe<C>
 where
-    S: Subscriber + for<'a> LookupSpan<'a>,
+    C: Collect + for<'a> LookupSpan<'a>,
 {
-    ConsoleLayer::builder().with_default_env().spawn::<S>()
+    ConsoleLayer::builder().with_default_env().spawn::<C>()
 }
 
 fn duration_from_env(var_name: &str) -> Option<Duration> {

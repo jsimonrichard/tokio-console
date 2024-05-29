@@ -346,7 +346,7 @@ checksum = "1ba75b3d9449ecdccb27ecbc479fdc0b87fa2dd43d2f8298f9bf0e59aacc8dce"
 dependencies = [
  "once_cell",
  "owo-colors",
- "tracing-core",
+ "tracing-core 0.1.31",
  "tracing-error",
 ]
 
@@ -406,7 +406,7 @@ dependencies = [
  "prost-types",
  "tonic",
  "tonic-build",
- "tracing-core",
+ "tracing-core 0.2.0",
 ]
 
 [[package]]
@@ -433,9 +433,9 @@ dependencies = [
  "tonic-web",
  "tower",
  "tower-http",
- "tracing",
- "tracing-core",
- "tracing-subscriber",
+ "tracing 0.2.0",
+ "tracing-core 0.2.0",
+ "tracing-subscriber 0.3.0",
 ]
 
 [[package]]
@@ -765,7 +765,7 @@ dependencies = [
  "slab",
  "tokio",
  "tokio-util",
- "tracing",
+ "tracing 0.1.37",
 ]
 
 [[package]]
@@ -894,7 +894,7 @@ dependencies = [
  "socket2",
  "tokio",
  "tower-service",
- "tracing",
+ "tracing 0.1.37",
  "want",
 ]
 
@@ -1837,7 +1837,7 @@ dependencies = [
  "signal-hook-registry",
  "socket2",
  "tokio-macros",
- "tracing",
+ "tracing 0.1.37",
  "windows-sys 0.48.0",
 ]
 
@@ -1864,9 +1864,9 @@ dependencies = [
  "toml",
  "tonic",
  "tower",
- "tracing",
+ "tracing 0.1.37",
  "tracing-journald",
- "tracing-subscriber",
+ "tracing-subscriber 0.3.17",
  "trycmd",
 ]
 
@@ -1913,7 +1913,7 @@ dependencies = [
  "futures-sink",
  "pin-project-lite",
  "tokio",
- "tracing",
+ "tracing 0.1.37",
 ]
 
 [[package]]
@@ -1961,7 +1961,7 @@ dependencies = [
  "tower",
  "tower-layer",
  "tower-service",
- "tracing",
+ "tracing 0.1.37",
 ]
 
 [[package]]
@@ -1994,7 +1994,7 @@ dependencies = [
  "tower-http",
  "tower-layer",
  "tower-service",
- "tracing",
+ "tracing 0.1.37",
 ]
 
 [[package]]
@@ -2014,7 +2014,7 @@ dependencies = [
  "tokio-util",
  "tower-layer",
  "tower-service",
- "tracing",
+ "tracing 0.1.37",
 ]
 
 [[package]]
@@ -2056,8 +2056,18 @@ dependencies = [
  "cfg-if",
  "log",
  "pin-project-lite",
- "tracing-attributes",
- "tracing-core",
+ "tracing-attributes 0.1.26",
+ "tracing-core 0.1.31",
+]
+
+[[package]]
+name = "tracing"
+version = "0.2.0"
+source = "git+https://github.com/jsimonrichard/tracing.git#ff28d722727f12bf5cd1f0a53d62511b6cc49726"
+dependencies = [
+ "pin-project-lite",
+ "tracing-attributes 0.2.0",
+ "tracing-core 0.2.0",
 ]
 
 [[package]]
@@ -2065,6 +2075,16 @@ name = "tracing-attributes"
 version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5f4f31f56159e98206da9efd823404b79b6ef3143b4a7ab76e67b1751b25a4ab"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.33",
+]
+
+[[package]]
+name = "tracing-attributes"
+version = "0.2.0"
+source = "git+https://github.com/jsimonrichard/tracing.git#ff28d722727f12bf5cd1f0a53d62511b6cc49726"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -2082,13 +2102,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "tracing-core"
+version = "0.2.0"
+source = "git+https://github.com/jsimonrichard/tracing.git#ff28d722727f12bf5cd1f0a53d62511b6cc49726"
+dependencies = [
+ "once_cell",
+]
+
+[[package]]
 name = "tracing-error"
 version = "0.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d686ec1c0f384b1277f097b2f279a2ecc11afe8c133c1aabf036a27cb4cd206e"
 dependencies = [
- "tracing",
- "tracing-subscriber",
+ "tracing 0.1.37",
+ "tracing-subscriber 0.3.17",
 ]
 
 [[package]]
@@ -2098,8 +2126,8 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1ba49f4829f4e95702943ec6b2fad8936b369d20fa27036caf01329fb230e460"
 dependencies = [
  "libc",
- "tracing-core",
- "tracing-subscriber",
+ "tracing-core 0.1.31",
+ "tracing-subscriber 0.3.17",
 ]
 
 [[package]]
@@ -2110,7 +2138,22 @@ checksum = "78ddad33d2d10b1ed7eb9d1f518a5674713876e97e5bb9b7345a7984fbb4f922"
 dependencies = [
  "lazy_static",
  "log",
- "tracing-core",
+ "tracing-core 0.1.31",
+]
+
+[[package]]
+name = "tracing-subscriber"
+version = "0.3.0"
+source = "git+https://github.com/jsimonrichard/tracing.git#ff28d722727f12bf5cd1f0a53d62511b6cc49726"
+dependencies = [
+ "matchers",
+ "once_cell",
+ "parking_lot",
+ "regex",
+ "sharded-slab",
+ "thread_local",
+ "tracing 0.2.0",
+ "tracing-core 0.2.0",
 ]
 
 [[package]]
@@ -2119,16 +2162,11 @@ version = "0.3.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "30a651bc37f915e81f087d86e62a18eec5f79550c7faff886f7090b4ea757c77"
 dependencies = [
- "matchers",
  "nu-ansi-term",
- "once_cell",
- "parking_lot",
- "regex",
  "sharded-slab",
  "smallvec",
  "thread_local",
- "tracing",
- "tracing-core",
+ "tracing-core 0.1.31",
  "tracing-log",
 ]
 

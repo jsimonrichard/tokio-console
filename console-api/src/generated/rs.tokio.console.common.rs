@@ -168,17 +168,7 @@ pub struct Metadata {
 /// Nested message and enum types in `Metadata`.
 pub mod metadata {
     /// Indicates whether metadata is associated with a span or with an event.
-    #[derive(
-        Clone,
-        Copy,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash,
-        PartialOrd,
-        Ord,
-        ::prost::Enumeration
-    )]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum Kind {
         /// Indicates metadata is associated with a span.
@@ -209,17 +199,7 @@ pub mod metadata {
     /// Describes the level of verbosity of a span or event.
     ///
     /// Corresponds to `Level` in the `tracing` crate.
-    #[derive(
-        Clone,
-        Copy,
-        Debug,
-        PartialEq,
-        Eq,
-        Hash,
-        PartialOrd,
-        Ord,
-        ::prost::Enumeration
-    )]
+    #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, ::prost::Enumeration)]
     #[repr(i32)]
     pub enum Level {
         /// The "error" level.

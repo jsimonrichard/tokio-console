@@ -4,7 +4,10 @@ version = "0.6.0"
 license = "MIT"
 edition = "2021"
 rust-version = "1.74.0"
-authors = ["Eliza Weisman <eliza@buoyant.io>", "Tokio Contributors <team@tokio.rs>",]
+authors = [
+    "Eliza Weisman <eliza@buoyant.io>",
+    "Tokio Contributors <team@tokio.rs>",
+]
 readme = "README.md"
 repository = "https://github.com/tokio-rs/console/"
 homepage = "https://github.com/tokio-rs/console/blob/main/console-api"
@@ -16,13 +19,7 @@ categories = [
     "development-tools::profiling",
     "asynchronous",
 ]
-keywords = [
-    "tracing",
-    "tokio-console",
-    "debugging",
-    "async",
-    "tonic",
-]
+keywords = ["tracing", "tokio-console", "debugging", "async", "tonic"]
 
 [features]
 # Generate code that is compatible with Tonic's `transport` module.
@@ -36,12 +33,13 @@ tonic = { version = "0.11", default-features = false, features = [
 ] }
 prost = "0.12"
 prost-types = "0.12"
-tracing-core = "0.1.17"
+tracing-core = { git = "https://github.com/jsimonrichard/tracing.git" }
 futures-core = "0.3"
 
 [dev-dependencies]
 tonic-build = { version = "0.11", default-features = false, features = [
-    "prost", "transport"
+    "prost",
+    "transport",
 ] }
 # explicit dep so we can get the version with fixed whitespace.
 prost-build = "0.12.0"
